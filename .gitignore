@@ -1,4 +1,5 @@
 __pycache__
 venv/
 yolov4/
-instance/
+static/uploads
+static/downloads

@@ -105,20 +105,52 @@
 
                     <!-- <form method="post" action="http://localhost:5000/detect-image" enctype="multipart/form-data"> -->
                         <div class="image-detection__modal">
-                            <input type="file" name="file" class="upload_hide" id="upload_custom" multiple="multiple">
-                            <label for="upload_custom" class="upload_label">
+                            <input type="file" name="file" class="upload__hide" id="image-upload-custom" multiple="multiple">
+                            <label for="image-upload-custom" class="upload__label">
                                 <i class="uil uil-upload-alt"></i>
-                                <p class="drag_text">Drag & Drop to Upload File</p>
+                                <p class="drag__text">Drag & Drop to Upload File</p>
                             </label>
                         </div>
                     <!-- </form> -->
                 </div>
                 
                 <img src="../static/uploads/images/image10.jpg" alt="">
-                {% if filenames %}
-                    {% for filename in filenames %}
+                {% if imagenames %}
+                    <!-- {% for filename in filenames %} -->
                         <img src="{{ url_for('static', filename=filename) }}" alt="">
-                    {% endfor %}
+                    <!-- {% endfor %} -->
+                {% endif %}
+            </div>
+        </section>
+
+        <!--==================== VIDEO DETECTION ====================-->
+        <section class="video-detection section" id="video-detection">
+            <h2 class="section__title">Video Detection</h2>
+            <span class="section__subtitle">Max 1 Video</span>
+
+            <div class="video-detection__container container grid">
+                <div class="video-detection__content">
+                    <div>
+                        <i class="uil uil-image video-detection__icon"></i>
+                        <h3 class="video-detection__title">Video Detection</h3>
+                    </div>
+
+                    <div class="video-detection__modal">
+                        <input type="file" name="file" class="upload__hide" id="video-upload-custom" multiple="multiple">
+                        <label for="video-upload-custom" class="upload__label">
+                            <i class="uil uil-upload-alt"></i>
+                            <p class="drag__text">Drag & Drop to Upload File</p>
+                        </label>
+                    </div>
+                </div>
+
+                <video autoplay="autoplay" controls="controls" preload="preload">
+                    <source src="../static/uploads/videos/DJI_0100.mp4" type="video/mp4">
+                </video>
+                {% if videonames %}
+                    <video autoplay="autoplay" controls="controls" preload="preload">
+                        <source src="{{ url_for('display_videos', filename=videonames) }}" type="video/mp4">
+                    </video>
                 {% endif %}
             </div>
         </section>

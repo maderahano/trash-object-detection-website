@@ -7,25 +7,25 @@ import subprocess
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'static/uploads/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'MP4'}
 
 app.secret_key = "maderahano"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+# app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 upload_images = os.path.join(UPLOAD_FOLDER, 'images')
 upload_videos = os.path.join(UPLOAD_FOLDER, 'videos')
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def allowed_image_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
 
-# upload_images = os.path.join(app.instance_path, 'uploads')
-# os.makedirs(upload_images, exist_ok=True)
+def allowed_video_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_VIDEO_EXTENSIONS
 
 @app.route("/")
 def main():
     return render_template('index.html')
-
 
 @app.route("/detect-image", methods=['POST'])
 def detect_image():
@@ -43,7 +43,7 @@ def detect_image():
     success = False
 
     for file in files: 
-        if file and allowed_file(file.filename):
+        if file and allowed_image_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(upload_images, filename))
             fileNames.append(filename)
@@ -63,7 +63,7 @@ def detect_image():
     if success:
         resp = jsonify({'message' : "Files successfully uploaded"})
         resp.status_code = 201
-        return render_template('index.html', filenames=fileNames) 
+        return render_template('index.html', imagenames=fileNames) 
     else:
         resp = jsonify(errors)
         resp.status_code = 400
@@ -73,6 +73,50 @@ def detect_image():
 def display_images(filename):
     print('display_image filename: ' + filename)
     return redirect(url_for('static', filename='uploads/images/' + filename), code=301)
+
+@app.route("/detect-video", methods=['POST'])
+def detect_video():
+    if not request.method == "POST":
+        return
+    
+    if 'file' not in request.files:
+        resp = jsonify({'message': 'No file part in the request'})
+        resp.status_code = 400
+        return resp
+    
+    files = request.files.getlist('file')
+    fileNames = []
+    errors = {}
+    success = False
+
+    for file in files: 
+        if file and allowed_video_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(upload_videos, filename))
+            fileNames.append(filename)
+            success = True
+            subprocess.run(['./darknet', 'detector', 'demo', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/videos/", filename), '-i', '0', '-out_filename', os.path.join("../static/downloads/videos/", filename), '-dont_show'], cwd='yolov4')
+        else:
+            errors[file.filename] = 'file type is not allowerd'
+    
+    if success and errors:
+        errors['message'] = 'File(s) successfully uploaded'
+        resp = jsonify(errors)
+        resp.status_code = 206
+        return resp
+    if success:
+        resp = jsonify({'message' : "Files successfully uploaded"})
+        resp.status_code = 201
+        return render_template('index.html', videonames=fileNames) 
+    else:
+        resp = jsonify(errors)
+        resp.status_code = 400
+        return resp
+    
+@app.route('/detect-video/<filename>')
+def display_videos(filename):
+    print('display_video filename: ' + filename)
+    return redirect(url_for('static', filename='uploads/videos/' + filename), code=301)
 
 # @app.route("/opencam", methods=['GET'])
 # def opencam():

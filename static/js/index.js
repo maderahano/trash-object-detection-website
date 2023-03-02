@@ -83,28 +83,15 @@ imageDetectionModalBtns.forEach((imageDetectionModalBtn, i) => {
     })
 })
 
-/* Modal Upload */
-const uploadCustom = document.querySelector('#upload_custom');
-
-let file;
-
-// uploadCustom.addEventListener('dragover', (event) => {
-//     event.preventDefault();
-//     console.log("Drag Over");
-// });
-
-// uploadCustom.addEventListener('dragleave', () => {
-//     console.log("Drag Leave");
-// });
-
+/* Modal Upload Image */
 $(document).ready(function (e) {
-    $('#upload_custom').on('click', function () {
-        $('#upload_custom').change(function () {
+    $('#image-upload-custom').on('click', function () {
+        $('#image-upload-custom').change(function () {
             var formData = new FormData();
-            var ins = document.getElementById('upload_custom').files.length;
+            var ins = document.getElementById('image-upload-custom').files.length;
     
             for (var i = 0; i < ins; i++) {
-                formData.append("file", document.getElementById('upload_custom').files[i]);
+                formData.append("file", document.getElementById('image-upload-custom').files[i]);
             }
     
             $.ajax({
@@ -139,13 +126,13 @@ $(document).ready(function (e) {
         });
     });
 
-    $('#upload_custom').on('drop', function () {
-        $('#upload_custom').change(function () {
+    $('#image-upload-custom').on('drop', function () {
+        $('#image-upload-custom').change(function () {
             var formData = new FormData();
-            var ins = document.getElementById('upload_custom').files.length;
+            var ins = document.getElementById('image-upload-custom').files.length;
 
             for (var i = 0; i < ins; i++) {
-                formData.append("file", document.getElementById('upload_custom').files[i]);
+                formData.append("file", document.getElementById('image-upload-custom').files[i]);
             }
 
             $.ajax({
@@ -181,55 +168,104 @@ $(document).ready(function (e) {
     });
 });
 
-// uploadCustom.addEventListener('click', () => {
-//     uploadCustom.onchange = ({target}) => {
-//         let file = target.files[0];
-
-//         let fileType = file.type;
-//         let validationExtensions = ['image/jpeg', 'image/jpg', 'image/png'];
+/*==================== VIDEO DETECTION MODAL ====================*/
+const videoDetectionModalViews = document.querySelectorAll('.video-detection__modal'),
+      videoDetectionModalBtns = document.querySelectorAll('.video-detection__content')
     
-//         if(validationExtensions.includes(fileType)) {
-//             let fileReader = new FileReader();
+let videoDetectionModal = function(videoDetectionModalClick){
+    videoDetectionModalViews[videoDetectionModalClick].classList.add('active-modal-video-detection')
+}
+
+videoDetectionModalBtns.forEach((videoDetectionModalBtn, i) => {
+    videoDetectionModalBtn.addEventListener('click', () => {
+        videoDetectionModal(i)
+    })
+})
+
+/* Modal Upload video */
+$(document).ready(function (e) {
+    $('#video-upload-custom').on('click', function () {
+        $('#video-upload-custom').change(function () {
+            var formData = new FormData();
+            var ins = document.getElementById('video-upload-custom').files.length;
     
-//             fileReader.onload = () => {
-//                 let fileURL = fileReader.result;
-//                 console.log(fileURL);
-//             };
-//             fileReader.readAsDataURL(file);
-//         } else {
-//             alert('This file is not an image!');
-//         }
+            for (var i = 0; i < ins; i++) {
+                formData.append("file", document.getElementById('video-upload-custom').files[i]);
+            }
     
-//         imageDetectionModalViews.forEach((imageDetectionModalView) => {
-//             imageDetectionModalView.classList.remove('active-modal-image-detection')
-//         })
-//     }
-// });
+            $.ajax({
+                url: '/detect-video',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: formData,
+                type: 'post',
+                success: function (response) {
+                    console.log("upload success", response);
+                    $('#msg').html('');
+                    $.each(response, function(key, data) {
+                        if (key !== 'message') {
+                            $('#msg').append(key + ' -> ' + data + '<br/>');
+                        } else {
+                            $('#msg').append(data + '<br/>');
+                        }
+                    })
+                },
+                error: function (response) {
+                    console.log("upload error", response);
+                    console.log(response.getAllResponseHeaders());
+                    $('#msg').html(response.message);
+                }
+            });
 
-// uploadCustom.addEventListener('drop', (event) => {
-//     event.preventDefault();
+            videoDetectionModalViews.forEach((videoDetectionModalView) => {
+                videoDetectionModalView.classList.remove('active-modal-video-detection')
+            })
+        });
+    });
 
-//     file = event.dataTransfer.files[0];
+    $('#video-upload-custom').on('drop', function () {
+        $('#video-upload-custom').change(function () {
+            var formData = new FormData();
+            var ins = document.getElementById('video-upload-custom').files.length;
 
-//     let fileType = file.type;
-//     let validationExtensions = ['image/jpeg', 'image/jpg', 'image/png'];
+            for (var i = 0; i < ins; i++) {
+                formData.append("file", document.getElementById('video-upload-custom').files[i]);
+            }
 
-//     if(validationExtensions.includes(fileType)) {
-//         let fileReader = new FileReader();
+            $.ajax({
+                url: 'detect-video',
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: formData,
+                type: 'post',
+                success: function (response) {
+                    console.log("upload success", response);
+                    $('#msg').html('');
+                    $.each(response, function(key, data) {
+                        if (key !== 'message') {
+                            $('#msg').append(key + ' -> ' + data + '<br/>');
+                        } else {
+                            $('#msg').append(data + '<br/>');
+                        }
+                    });
+                },
+                error: function (response) {
+                    console.log("upload error", response);
+                    console.log(response.getAllResponseHeaders());
+                    $('#msg').html(response.message);
+                }  
+            });
 
-//         fileReader.onload = () => {
-//             let fileURL = fileReader.result;
-//             console.log(fileURL);
-//         };
-//         fileReader.readAsDataURL(file);
-//     } else {
-//         alert('This file is not an image!');
-//     }
-
-//     imageDetectionModalViews.forEach((imageDetectionModalView) => {
-//         imageDetectionModalView.classList.remove('active-modal-image-detection')
-//     })
-// });
+            videoDetectionModalViews.forEach((videoDetectionModalView) => {
+                videoDetectionModalView.classList.remove('active-modal-video-detection')
+            })
+        });
+    });
+});
 
 /*==================== PORTFOLIO SWIPER ====================*/
 let swiperPortfolio = new Swiper('.portfolio__container', {
