@@ -1,8 +1,9 @@
 from re import DEBUG, sub
-from flask import Flask, render_template, request, redirect, send_file, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, send_file, url_for, flash, jsonify, Response
 from werkzeug.utils import secure_filename, send_from_directory
 import os
 import subprocess
+import cv2
 
 app = Flask(__name__)
 
@@ -26,6 +27,8 @@ def allowed_video_file(filename):
 @app.route("/")
 def main():
     return render_template('index.html')
+
+# IMAGE DETECTION
 
 @app.route("/detect-image", methods=['POST'])
 def detect_image():
@@ -69,10 +72,12 @@ def detect_image():
         resp.status_code = 400
         return resp
     
-@app.route("/detect-image/<filename>")
-def display_images(filename):
-    print('display_image filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/images/' + filename), code=301)
+# @app.route("/detect-image/<filename>")
+# def display_images(filename):
+#     print('display_image filename: ' + filename)
+#     return redirect(url_for('static', filename='uploads/images/' + filename), code=301)
+
+# VIDEO DETECTION
 
 @app.route("/detect-video", methods=['POST'])
 def detect_video():
@@ -113,10 +118,29 @@ def detect_video():
         resp.status_code = 400
         return resp
     
-@app.route('/detect-video/<filename>')
-def display_videos(filename):
-    print('display_video filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/videos/' + filename), code=301)
+# WEBCAM DETECTION
+
+camera = cv2.VideoCapture(0)
+
+def gen_webcam_frames():
+    while True:
+        success, frame = camera.read()
+        if not success:
+            break
+        else:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    
+@app.route('/live-webcam')
+def live_webcam():
+    return Response(gen_webcam_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+# @app.route('/detect-video/<filename>')
+# def display_videos(filename):
+#     print('display_video filename: ' + filename)
+#     return redirect(url_for('static', filename='uploads/videos/' + filename), code=301)
 
 # @app.route("/opencam", methods=['GET'])
 # def opencam():
@@ -124,7 +148,6 @@ def display_videos(filename):
 #     subprocess.run(['python3', 'detect.py', '--source', '0'])
 #     return "done"
     
-
 # @app.route('/return-files', methods=['GET'])
 # def return_file():
 #     obj = request.args.get('obj')

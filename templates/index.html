@@ -114,11 +114,11 @@
                     <!-- </form> -->
                 </div>
                 
-                <img src="../static/uploads/images/image10.jpg" alt="">
+                <!-- <img src="../static/uploads/images/image10.jpg" alt=""> -->
                 {% if imagenames %}
-                    <!-- {% for filename in filenames %} -->
-                        <img src="{{ url_for('static', filename=filename) }}" alt="">
-                    <!-- {% endfor %} -->
+                    {% for imagename in imagenames %}
+                        <img src="../static/uploads/images/{{ imagename }}" alt="">
+                    {% endfor %}
                 {% endif %}
             </div>
         </section>
@@ -144,14 +144,31 @@
                     </div>
                 </div>
 
-                <video autoplay="autoplay" controls="controls" preload="preload">
+                <!-- <video autoplay="autoplay" controls="controls" preload="preload">
                     <source src="../static/uploads/videos/DJI_0100.mp4" type="video/mp4">
-                </video>
+                </video> -->
                 {% if videonames %}
                     <video autoplay="autoplay" controls="controls" preload="preload">
                         <source src="{{ url_for('display_videos', filename=videonames) }}" type="video/mp4">
                     </video>
                 {% endif %}
+            </div>
+        </section>
+
+        <!--==================== LIVE WEBCAM DETECTION ====================-->
+        <section class="video-detection section" id="video-detection">
+            <h2 class="section__title">Live Webcam Detection</h2>
+            <span class="section__subtitle">Use Webcam</span>
+
+            <div class="video-detection__container container grid">
+                <div class="video-detection__content">
+                    <div>
+                        <i class="uil uil-image video-detection__icon"></i>
+                        <h3 class="video-detection__title">Webcam Detection</h3>
+                    </div>
+                </div>
+
+                <!-- <img src="{{ url_for('live_webcam') }}" width="100%"> -->
             </div>
         </section>
     </main>
