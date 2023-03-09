@@ -156,19 +156,32 @@
         </section>
 
         <!--==================== LIVE WEBCAM DETECTION ====================-->
-        <section class="video-detection section" id="video-detection">
+        <section class="webcam-detection section" id="webcam-detection">
             <h2 class="section__title">Live Webcam Detection</h2>
             <span class="section__subtitle">Use Webcam</span>
 
-            <div class="video-detection__container container grid">
-                <div class="video-detection__content">
+            <div class="webcam-detection__container container grid">
+                <div class="webcam-detection__content" id="webcam-detection-custom">
                     <div>
-                        <i class="uil uil-image video-detection__icon"></i>
-                        <h3 class="video-detection__title">Webcam Detection</h3>
+                        <i class="uil uil-image webcam-detection__icon"></i>
+                        <h3 class="webcam-detection__title">Webcam Detection</h3>
                     </div>
                 </div>
 
-                <!-- <img src="{{ url_for('live_webcam') }}" width="100%"> -->
+                <!-- <div id="recorder">
+                    <button id="record">Record</button>
+                    <button id="stop">Stop</button>
+                    <a id="download"></a>
+                </div> -->
+                <form method="post" action="{{ url_for('tasks') }}">
+                    <input type="submit" value="Stop/Start" name="stop">
+                    <input type="submit" value="Trash" name="trash">
+                    <input type="submit" value="Capture" name="click">
+                    <input type="submit" value="Grey" name="grey">
+                    <input type="submit" value="Negative" name="neg">
+                    <input type="submit" value="Start/Stop Recording" name="rec">
+                </form>
+                <img id="video" src="{{ url_for('live_webcam') }}">
             </div>
         </section>
     </main>

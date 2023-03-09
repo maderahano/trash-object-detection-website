@@ -521,6 +521,41 @@ video{
     visibility: visible;
 }
 
+/*==================== LIVE WEBCAM DETECTION ====================*/
+.webcam-detection__container{
+    gap: 1.5rem;
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.webcam-detection__content{
+    width: 240px;
+    height: 145px;
+    background-color: var(--container-color);
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    border-radius: .25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    transition: .3s;
+    cursor: pointer;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.webcam-detection__content:hover{
+    box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+
+.webcam-detection__icon{
+    display: block;
+    font-size: 3rem;
+    color: var(--first-color);
+}
+
+.webcam-detection__title{
+    font-size: var(--h3-font-size);
+    margin-bottom: var(--mb-1);
+    font-weight: var(--font-semi-bold);
+}
+
 /*==================== MODAL UPLOAD ====================*/
 .upload__hide{
     position: absolute;

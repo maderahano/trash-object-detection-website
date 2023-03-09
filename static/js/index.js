@@ -267,6 +267,86 @@ $(document).ready(function (e) {
     });
 });
 
+/*==================== LIVE WEBCAM DETECTION MODAL ====================*/
+
+// var buttonRecord = document.getElementById("record");
+// var buttonStop = document.getElementById("stop");
+
+// buttonStop.disabled = true;
+
+// buttonRecord.onclick = function() {
+//     buttonRecord.disabled = true;
+//     buttonStop.disabled = false;
+
+//     // Disable Download Link
+//     var downloadLink = document.getElementById("download");
+//     downloadLink.text = "";
+//     downloadLink.href = "";
+
+//     // XMLHttpRequest
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function() {
+//         if (xhr.readyState == 4 && xhr.status == 200) {
+//             // alert(xhr.responseText);
+//         }
+//     }
+//     xhr.open("POST", "/record_status");
+//     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//     xhr.send(JSON.stringify({status: "true"}));
+// }
+
+// buttonStop.onclick = fucntion() {
+//     buttonRecord.disabled = false;
+//     buttonStop.disabled = true;
+
+//     // XMLHttpRequest
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function() {
+//         if (xhr.readyState == 4 && xhr.status == 200) {
+//             // alert(xhr.responseText);
+
+//             // Enable Download Link
+//             var downloadLink = document.getElementById("download");
+//             downloadLink.text = "Download Video";
+//             downloadLink.href = "/static/video.avi";
+//         }
+//     }
+//     xhr.open("POST", "/record_status");
+//     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+//     xhr.send(JSON.stringify({ status: "false" }));
+// }
+
+/* Modal Upload video */
+$(document).ready(function (e) {
+    $('#webcam-detection-custom').on('click', function () {
+        $.ajax({
+            url: '/live-webcam',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: formData,
+            type: 'post',
+            success: function (response) {
+                console.log("upload success", response);
+                $('#msg').html('');
+                $.each(response, function(key, data) {
+                    if (key !== 'message') {
+                        $('#msg').append(key + ' -> ' + data + '<br/>');
+                    } else {
+                        $('#msg').append(data + '<br/>');
+                    }
+                })
+            },
+            error: function (response) {
+                console.log("upload error", response);
+                console.log(response.getAllResponseHeaders());
+                $('#msg').html(response.message);
+            }
+        });
+    });
+});
+
 /*==================== PORTFOLIO SWIPER ====================*/
 let swiperPortfolio = new Swiper('.portfolio__container', {
     cssMode: true,

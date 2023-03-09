@@ -1,9 +1,16 @@
 from re import DEBUG, sub
 from flask import Flask, render_template, request, redirect, send_file, url_for, flash, jsonify, Response
 from werkzeug.utils import secure_filename, send_from_directory
-import os
+import random
+import os, sys
+import darknet
+import colorsys
 import subprocess
+import datetime, time
 import cv2
+import imutils
+import numpy as np
+from threading import Thread
 
 app = Flask(__name__)
 
@@ -56,7 +63,7 @@ def detect_image():
             subprocess.run(['cp', 'predictions.jpg', filename], cwd='static/downloads/images')
             subprocess.run(['rm', 'predictions.jpg'], cwd='static/downloads/images')
         else:
-            errors[file.filename] = 'file type is not allowerd'
+            errors[file.filename] = 'file type is not allowed'
     
     if success and errors:
         errors['message'] = 'File(s) successfully uploaded'
@@ -120,22 +127,195 @@ def detect_video():
     
 # WEBCAM DETECTION
 
+global capture, rec_frame, grey, switch, neg, rec, out, trash
+trash = 0
+capture = 0
+grey = 0
+neg = 0
+switch = 0
+rec = 0
+
+# yolo variable
+
+global metaMain, netMain, altNames
+netMain = None
+metaMain = None
+altNames = None
+
+# Make Shots Directory to Save Pics
+try:
+    os.mkdir('./shots')
+except OSError as error:
+    pass
+
 camera = cv2.VideoCapture(0)
 
+def record(out):
+    global rec_frame
+    while(rec):
+        time.sleep(0.05)
+        out.write(rec_frame)
+
+def detect_webcam_trash(frame):
+    global start_x, start_y, box_width, box_height, label
+    start_x = 0
+    start_y = 0
+    box_width = 0
+    box_height = 0
+    label = 0
+
+    frame_width = frame.shape[1]
+    frame_height = frame.shape[0]
+    
+    frame_blob = cv2.dnn.blobFromImage(frame, 1 / 255, (416, 416), swapRB=True, crop=False)
+
+    with open("yolov4/data/obj.names","r", encoding="utf-8") as f:
+        labels = f.read().strip().split("\n")
+
+    colors = ["0,255,255", "0,0,255", "255,0,0", "255,255,0", "0,255,0"]
+    colors = [np.array(color.split(",")).astype("int") for color in colors]
+    colors = np.array(colors)
+    colors = np.tile(colors, (18, 1))
+
+    yolo_config_path = "yolov4/cfg/trash.cfg"
+    yolo_weights_path = "yolov4/backup/trash/training/trash_best.weights"
+
+    net = cv2.dnn.readNetFromDarknet(yolo_config_path, yolo_weights_path)
+    layers = net.getLayerNames()
+
+    output_layer = [layers[i - 1] for i in net.getUnconnectedOutLayers()]
+    net.setInput(frame_blob)
+    detection_layers = net.forward(output_layer)
+
+    ids_list = []
+    boxes_list = []
+    confidences_list = []
+
+    for detection_layer in detection_layers:
+        for object_detection in detection_layer:
+
+            scores = object_detection[5:]
+            predicted_id = np.argmax(scores)
+            confidence = scores[predicted_id]
+
+            if confidence > 0.35:
+                
+                label = labels[predicted_id]
+                bounding_box = object_detection[0:4] * np.array([frame_width, frame_height, frame_width, frame_height])
+                (box_center_x, box_center_y, box_width, box_height) = bounding_box.astype("int")
+
+                start_x = int(box_center_x - (box_width / 2))
+                start_y = int(box_center_y - (box_height / 2))
+
+                ids_list.append(predicted_id)
+                confidences_list.append(float(confidence))
+                boxes_list.append([start_x, start_y, int(box_width), int(box_height)])
+            max_ids = cv2.dnn.NMSBoxes(boxes_list, confidences_list, 0.5, 0.4)
+
+    for max_id in max_ids:
+        max_class_id = max_id[0]
+        box = boxes_list[max_class_id]
+
+        start_x = box[0]
+        start_y = box[1]
+        box_width = box[2]
+        box_height = box[3]
+
+        predicted_id = ids_list[max_class_id]
+        label = labels[predicted_id]
+        confidence = confidences_list[max_class_id]
+
+    end_x = start_x + box_width
+    end_y = start_y + box_height
+
+    box_color = colors[predicted_id]
+    box_color = [int(each) for each in box_color]
+    label = "{}: {:.2f}%".format(label, confidence * 100)
+    print("predicted object {}".format(label))
+
+    cv2.rectangle(frame, (start_x, start_y), (end_x, end_y), box_color, 2)
+    cv2.putText(frame, label, (start_x, start_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, box_color, 2)
+
+    return frame
+
 def gen_webcam_frames():
+    global out, capture, rec_frame
     while True:
         success, frame = camera.read()
-        if not success:
-            break
+        if success:
+            if(trash):
+                frame = detect_webcam_trash(frame)
+            if(grey):
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            if(neg):
+                frame = cv2.bitwise_not(frame)
+            if(capture):
+                capture = 0
+                now = datetime.datetime.now()
+                p = os.path.sep.join(['static', "shot_{}.png".format(str(now).replace(":",''))])
+                cv2.imwrite(p, frame)
+            if(rec):
+                rec_frame = frame
+                frame = cv2.putText(cv2.flip(frame,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
+                frame = cv2.flip(frame,1)
+
+            try:                
+                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except Exception as e:
+                pass
         else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            pass
     
 @app.route('/live-webcam')
 def live_webcam():
     return Response(gen_webcam_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/requests', methods=['POST', 'GET'])
+def tasks():
+    global switch, camera
+    if request.method == 'POST':
+        if request.form.get('click') == 'Capture':
+            global capture
+            capture = 1
+        elif request.form.get('trash') == 'Trash':
+            global trash
+            trash = not trash
+            if (trash):
+                time.sleep(4)
+        elif request.form.get('grey') == 'Grey':
+            global grey
+            grey = not grey
+        elif request.form.get('neg') == 'Negative':
+            global neg
+            neg = not neg
+        elif request.form.get('stop') == 'Stop/Start':
+            if (switch == 1):
+                switch = 0
+                camera.release()
+                cv2.destroyAllWindows()
+            else:
+                camera = cv2.VideoCapture(0)
+                switch = 1
+        elif request.form.get('rec') == 'Start/Stop Recording':
+            global rec, out
+            rec = not rec
+            if (rec):
+                now = datetime.datetime.now()
+                fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                out = cv2.VideoWriter('vid_{}.avi'.format(str(now).replace(":",'')), fourcc, 20.0, (640, 480))
+                # Start New Thread for Recording the Video
+                thread = Thread(target = record, args=[out,])
+                thread.start()
+            elif (rec == False):
+                out.release()
+    elif request.method == 'GET':
+        return render_template('index.html')
+    return render_template('index.html')
+
+camera.release()
+cv2.destroyAllWindows()
 
 # @app.route('/detect-video/<filename>')
 # def display_videos(filename):
