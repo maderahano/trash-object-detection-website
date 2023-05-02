@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--==================== BOOTSTRAP ====================-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    <!--==================== UNICONS ====================-->
+    <link rel="stylesheet" type="text/css" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+
+    <!--==================== SWIPER CSS ====================-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/swiper-bundle.min.css') }}">
+
+    <!--==================== CSS ====================-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+
+    <title>Trash Object Detection Website</title>
+</head>
+<body>
+    <!--==================== HEADER ====================-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="#" class="nav__logo">Trash Object Detection Website</a>
+
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list grid">
+                    <li class="nav__item">
+                        <a href="/" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Home
+                        </a>
+                    </li>
+                    <!-- <li class="nav__item">
+                        <a href="/live" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Live
+                        </a>
+                    </li> -->
+                    <li class="nav__item">
+                        <a href="/try-upload" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Upload
+                        </a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="/map" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Map
+                        </a>
+                    </li>
+                    <!-- <li class="nav__item">
+                        <a href="/try-upload" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Try Upload
+                        </a>
+                    </li> -->
+                    <li class="nav__item">
+                        <a href="/drone" class="nav__link active-link">
+                            <i class="uil uil-estate nav__icon"></i> Drone
+                        </a>
+                    </li>
+                </ul>
+                <i class="uil uil-times nav__close" id="nav-close"></i>
+            </div>
+
+            <div class="nav__btns">
+                <!-- Theme Change Button -->
+                <i class="uil uil-moon change-theme" id="theme-button"></i>
+
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class="uil uil-apps"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!--==================== MAIN ====================-->
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!--==================== FOOTER ====================-->
+    <!-- <footer class="footer">
+        <div class="footer__bg">
+            <div class="footer__container container grid">
+                <div>
+                    <h1 class="footer__title">Made Rahano</h1>
+                    <span class="footer__subtitle">Software Engineer</span>
+                </div>
+
+                <div class="footer__socials">
+                    <a href="https://www.instagram.com/md.rahano/" target="_blank" class="footer__social">
+                        <i class="uil uil-instagram"></i>
+                    </a>
+
+                    <a href="https://github.com/maderahano" target="_blank" class="footer__social">
+                        <i class="uil uil-github-alt"></i>
+                    </a>
+
+                    <a href="https://www.linkedin.com/in/maderahano/" target="_blank" class="footer__social">
+                        <i class="uil uil-linkedin-alt"></i>
+                    </a>
+                </div>
+            </div>
+
+            <p class="footer__copy">&#169; Made Rahano. All right reserved</p>
+        </div>
+    </footer> -->
+
+    <!--==================== SCROLL TOP ====================-->
+    <a href="#" class="scrollup" id="scroll-up">
+        <i class="uil uil-arrow-up scrollup__icon"></i>
+    </a>
+
+    <!--==================== HLS ====================-->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
+    <!--==================== BOOTSTRAP ====================-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+
+    <!--==================== JQUERY ====================-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script> -->
+
+    <!--==================== JQUERY FORM ====================-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha512-YUkaLm+KJ5lQXDBdqBqk7EVhJAdxRnVdT2vtCzwPHSweCzyMgYV/tgGF4/dCyqtCC2eCphz0lRQgatGVdfR0ww==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!--==================== SWIPER JS ====================-->
+    <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+
+    <!--==================== MAIN JS ====================-->
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

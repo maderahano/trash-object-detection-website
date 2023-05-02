@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="detection section" id="detection">
+    <h2 class="section__title">Upload Your File</h2>
+    <span class="section__subtitle">Only JPG, PNG, and JPEG, MP4 file!</span>
+
+    <div class="detection__container container grid">
+        <!--==================== IMAGE DETECTION ====================-->
+        <div class="image-detection__content">
+            <div>
+                <i class="uil uil-image image-detection__icon"></i>
+                <h3 class="image-detection__title">Image Detection</h3>
+            </div>
+
+            <div class="image-detection__modal">
+                <input type="file" name="file" class="upload__hide" id="image-upload-custom" multiple="multiple">
+                <label for="image-upload-custom" class="upload__label">
+                    <i class="uil uil-upload-alt"></i>
+                    <p class="drag__text">Drag & Drop to Upload File</p>
+                </label>
+            </div>
+        </div>
+
+        <!--==================== VIDEO DETECTION ====================-->
+        <div class="video-detection__content">
+            <div>
+                <i class="uil uil-image video-detection__icon"></i>
+                <h3 class="video-detection__title">Video Detection</h3>
+            </div>
+
+            <div class="video-detection__modal">
+                <input type="file" name="file" class="upload__hide" id="video-upload-custom" multiple="multiple">
+                <label for="video-upload-custom" class="upload__label">
+                    <i class="uil uil-upload-alt"></i>
+                    <p class="drag__text">Drag & Drop to Upload File</p>
+                </label>
+            </div>
+        </div>
+    </div>
+    {% if imagenames %}
+        {% for imagename in imagenames %}
+            <img src="../static/uploads/images/{{ imagenames }}" alt="">
+        {% endfor %}
+    {% endif %}
+
+    <!-- <video autoplay="autoplay" controls="controls" preload="preload">
+        <source src="../static/uploads/videos/DJI_0100.mp4" type="video/mp4">
+    </video> -->
+    {% if videonames %}
+        <video autoplay="autoplay" controls="controls" preload="preload">
+            <source src="{{ url_for('display_videos', filename=videonames) }}" type="video/mp4">
+        </video>
+    {% endif %}
+</section>
+{% endblock %}

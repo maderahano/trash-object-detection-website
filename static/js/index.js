@@ -69,6 +69,37 @@ tabs.forEach(tab =>{
     })
 })
 
+/*==================== UPLOAD DETECTION ====================*/
+// $(document).ready(function() {
+//     $('#uploadImage').submit(function(event) {
+//         if($('#uploadImageFile').val()) {
+//             event.preventDefault();
+//             // alert('success');
+
+//             $('#targetLayer').hide();
+//             $(this).ajaxSubmit({
+//                 target: '#targetLayer',
+//                 beforeSubmit: function() {
+//                     $('.progress-bar').width('50%');
+//                 },
+//                 uploadProgress: function(event, position, total, percentageComplete) {
+//                     $('.progress-bar').animate({
+//                         width: percentageComplete + '%'
+//                     }, {
+//                         duration: 1000
+//                     });
+//                 },
+//                 success: function(data) {
+//                     $('#targetLayer').show();
+//                     $('#targetLayer').append(data.htmlresponse);
+//                 },
+//                 resetForm: true
+//             });
+//         }
+//         return false;
+//     });
+// });
+
 /*==================== IMAGE DETECTION MODAL ====================*/
 const imageDetectionModalViews = document.querySelectorAll('.image-detection__modal'),
       imageDetectionModalBtns = document.querySelectorAll('.image-detection__content')
@@ -83,10 +114,36 @@ imageDetectionModalBtns.forEach((imageDetectionModalBtn, i) => {
     })
 })
 
+imageDetectionModalViews.forEach((modalCloseEsc) => {
+    modalCloseEsc.addEventListener('keydown', (e) => {
+        imageDetectionModalViews.forEach((imageDetectionModalView) => {
+            if (e.keyCode === 27) {
+                imageDetectionModalView.classList.remove('active-modal-image-detection')
+            };
+        })
+    })
+})
+
+$(document).ready(function() {
+    document.getElementById("uploadImageFile").onchange = function() {
+        document.getElementById("uploadImage").submit(function(event) {
+            if($('#uploadImageFile').val()) {
+                event.preventDefault();
+            }
+            return false;
+        });
+        
+        imageDetectionModalViews.forEach((imageDetectionModalView) => {
+            imageDetectionModalView.classList.remove('active-modal-image-detection')
+        })
+    }
+});
+
 /* Modal Upload Image */
 $(document).ready(function (e) {
     $('#image-upload-custom').on('click', function () {
-        $('#image-upload-custom').change(function () {
+        $('#image-upload-custom').change(function (event) {
+            event.preventDefault();
             var formData = new FormData();
             var ins = document.getElementById('image-upload-custom').files.length;
     
@@ -104,19 +161,11 @@ $(document).ready(function (e) {
                 type: 'post',
                 success: function (response) {
                     console.log("upload success", response);
-                    $('#msg').html('');
-                    $.each(response, function(key, data) {
-                        if (key !== 'message') {
-                            $('#msg').append(key + ' -> ' + data + '<br/>');
-                        } else {
-                            $('#msg').append(data + '<br/>');
-                        }
-                    })
+                    $('#targetLayer').append(data.htmlresponse);
                 },
                 error: function (response) {
                     console.log("upload error", response);
                     console.log(response.getAllResponseHeaders());
-                    $('#msg').html(response.message);
                 }
             });
 
@@ -181,6 +230,31 @@ videoDetectionModalBtns.forEach((videoDetectionModalBtn, i) => {
         videoDetectionModal(i)
     })
 })
+
+videoDetectionModalViews.forEach((modalCloseEsc) => {
+    modalCloseEsc.addEventListener('keydown', (e) => {
+        videoDetectionModalViews.forEach((videoDetectionModalView) => {
+            if (e.keyCode === 27) {
+                videoDetectionModalView.classList.remove('active-modal-video-detection')
+            };
+        })
+    })
+})
+
+$(document).ready(function() {
+    document.getElementById("uploadVideoFile").onchange = function() {
+        document.getElementById("uploadVideo").submit(function(event) {
+            if($('#uploadVideoFile').val()) {
+                event.preventDefault();
+            }
+            return false;
+        });
+        
+        videoDetectionModalViews.forEach((videoDetectionModalView) => {
+            videoDetectionModalView.classList.remove('active-modal-video-detection')
+        })
+    }
+});
 
 /* Modal Upload video */
 $(document).ready(function (e) {
@@ -267,6 +341,26 @@ $(document).ready(function (e) {
     });
 });
 
+let swiper = new Swiper(".show-image-detection__container", {
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+  });
+
+let swiperResultImage = new Swiper('.show-image-detection__container', {
+    cssMode: true,
+    loop: true,
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+    },
+});
+
 /*==================== LIVE WEBCAM DETECTION MODAL ====================*/
 
 // var buttonRecord = document.getElementById("record");
@@ -316,36 +410,70 @@ $(document).ready(function (e) {
 //     xhr.send(JSON.stringify({ status: "false" }));
 // }
 
-/* Modal Upload video */
-$(document).ready(function (e) {
-    $('#webcam-detection-custom').on('click', function () {
-        $.ajax({
-            url: '/live-webcam',
-            dataType: 'json',
-            cache: false,
-            contentType: false,
-            processData: false,
-            data: formData,
-            type: 'post',
-            success: function (response) {
-                console.log("upload success", response);
-                $('#msg').html('');
-                $.each(response, function(key, data) {
-                    if (key !== 'message') {
-                        $('#msg').append(key + ' -> ' + data + '<br/>');
-                    } else {
-                        $('#msg').append(data + '<br/>');
-                    }
-                })
-            },
-            error: function (response) {
-                console.log("upload error", response);
-                console.log(response.getAllResponseHeaders());
-                $('#msg').html(response.message);
-            }
-        });
+/*==================== LIVE DRONE DETECTION MODAL ====================*/
+
+/* Modal Upload Data Link RTMP */
+// $(document).ready(function () {
+//     $('form').on('submit', function (event) {
+//         $.ajax({
+//             url: '/live-drone',
+//             type: 'post',
+//             data : {
+//                 link_rtmp : $('#linkrtmpInput').val()
+//             }
+//         });
+//         console.log(data)
+//         event.preventDefault();
+//     });
+// });
+
+/*==================== DRONE DETECTION MODAL ====================*/
+// const droneDetectionModalViews = document.querySelectorAll('.drone-detection__modal'),
+//       droneDetectionModalBtns = document.querySelectorAll('.drone-detection__content'),
+//       droneDetectionModalCloses = document.querySelectorAll('.drone-detection__modal-close')
+    
+// let droneDetectionModal = function(droneDetectionModalClick){
+//     droneDetectionModalViews[droneDetectionModalClick].classList.add('active-modal-drone-detection')
+// }
+
+// droneDetectionModalBtns.forEach((droneDetectionModalBtn, i) => {
+//     droneDetectionModalBtn.addEventListener('click', () => {
+//         droneDetectionModal(i)
+//     })
+// })
+
+// droneDetectionModalCloses.forEach((modalClose) => {
+//     modalClose.addEventListener('click', () => {
+//         droneDetectionModalViews.forEach((droneDetectionModalView) => {
+//             droneDetectionModalView.classList.remove('active-modal-drone-detection')
+//         })
+//     })
+// })
+
+// droneDetectionModalViews.forEach((modalCloseEsc) => {
+//     modalCloseEsc.addEventListener('keydown', (e) => {
+//         droneDetectionModalViews.forEach((droneDetectionModalView) => {
+//             if (e.keyCode === 27) {
+//                 droneDetectionModalView.classList.remove('active-modal-drone-detection')
+//             };
+//         })
+//     })
+// })
+
+/*==================== Stream Drone ====================*/
+if (Hls.isSupported()) {
+    var video = document.getElementById('streamDrone');
+    var hls = new Hls();
+    // bind them together
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+      console.log("video and hls.js are now bound together !");
+      hls.loadSource("http://<ip-address-of-web-server>/live/mystream.m3u8");
+      hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+        console.log("manifest loaded, found " + data.levels.length + " quality level");
+      });
     });
-});
+  }
 
 /*==================== PORTFOLIO SWIPER ====================*/
 let swiperPortfolio = new Swiper('.portfolio__container', {

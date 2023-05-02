@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="detection section" id="detection">
+    <h2 class="section__title">Upload Your File</h2>
+    <span class="section__subtitle">Only JPG, PNG, and JPEG, MP4 file!</span>
+
+    <div class="detection__container container grid">
+        <!--==================== IMAGE DETECTION ====================-->
+        <div class="image-detection__content">
+            <div>
+                <i class="uil uil-image image-detection__icon"></i>
+                <h3 class="image-detection__title">Image Detection</h3>
+            </div>
+            
+            <form class="image-detection__modal" id="uploadImage" method="post" action="/upload-images" enctype="multipart/form-data">
+                <input type="file" name="uploadImageFiles" multiple="true" class="upload__hide" id="uploadImageFile" accept=".jpg, .png, .jpeg">
+                <label for="image-upload-custom" class="upload__label">
+                    <i class="uil uil-upload-alt"></i>
+                    <p class="drag__text">Drag & Drop to Upload File</p>
+                </label>
+            </form>
+        </div>
+
+        <!--==================== VIDEO DETECTION ====================-->
+        <div class="video-detection__content">
+            <div>
+                <i class="uil uil-image video-detection__icon"></i>
+                <h3 class="video-detection__title">Video Detection</h3>
+            </div>
+
+            <form class="video-detection__modal" id="uploadVideo" method="post" action="/upload-videos" enctype="multipart/form-data">
+                <input type="file" name="uploadVideoFiles" multiple="true" class="upload__hide" id="uploadVideoFile" accept=".mp4, .MP4">
+                <label for="video-upload-custom" class="upload__label">
+                    <i class="uil uil-upload-alt"></i>
+                    <p class="drag__text">Drag & Drop to Upload File</p>
+                </label>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="result section" id="result">
+    <div class="portfolio__container container swiper">
+        {% if imagenames %}
+        <div class="swiper-wrapper">
+            {% for imagename in imagenames %}
+            <div class="portfolio__content grid swiper-slide">
+                <img src="/static/downloads/images/{{ imagename }}" alt="" class="portfolio__img">
+            </div>
+            <a href="{{ url_for('download_detection_image', filename=imagename) }}" class="btn btn-default">{{ imagename }}</a>
+            {% endfor %}
+        </div>
+        <a href="/download-images" class="btn btn-default">{{ imagenames }}</a>
+        {% endif %}
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+    {% if videonames %}
+        {% for videoname in videonames %}
+            <video controls="controls" preload="preload">
+                <source src="/static/uploads/videos/{{ videoname }}" type="video/mp4"></source>
+            </video>
+            <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default">{{ videoname }}</a>
+        {% endfor %}
+        <a href="/download-videos" class="btn btn-default">{{ videonames }}</a>
+    {% endif %}
+    <!-- <div class="portfolio__container container swiper">
+        {% if videonames %}
+        <div class="swiper-wrapper">
+            {% for videoname in videonames %}
+            <div class="portfolio__content grid swiper-slide">
+                <video controls="controls" preload="preload">
+                    <source src="/static/uploads/videos/{{ videoname }}" type="video/mp4"></source>
+                </video>
+            </div>
+            <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default">{{ videoname }}</a>
+            {% endfor %}
+        </div>
+        <a href="/download-videos" class="btn btn-default">{{ videonames }}</a>
+        {% endif %}
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div> -->
+</section>
+
+<!-- {% if imagenames %}
+    {% for imagename in imagenames %}
+        <img src="/static/downloads/images/{{ imagename }}" alt="" class="portfolio__img">
+        <a href="{{ url_for('download_detection_image', filename=imagename) }}" class="btn btn-default">{{ imagename }}</a>
+    {% endfor %}
+    <a href="/download-images" class="btn btn-default">{{ imagenames }}</a>+
+{% endif %}
+
+{% if videonames %}
+    {% for videoname in videonames %}
+        <video controls="controls" preload="preload">
+            <source src="/static/uploads/videos/{{ videoname }}" type="video/mp4"></source>
+        </video>
+        <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default">{{ videoname }}</a>
+    {% endfor %}
+    <a href="/download-videos" class="btn btn-default">{{ videonames }}</a>
+{% endif %} -->
+
+<!-- <section class="result section"> 
+    {% if imagenames %}
+        {% for imagename in imagenames %}
+            <img src="/static/downloads/images/{{ imagename }}">
+            <a href="{{ url_for('download_detection_image', filename=imagename) }}" class="btn btn-default">{{ imagename }}</a>
+        {% endfor %}
+        <a href="/download-images" class="btn btn-default">{{ imagenames }}</a>
+    {% endif %}
+</section> -->
+
+<!-- <section class="result section"> 
+    <div class="show-image-detection__container container swiper">
+        {% if imagenames %}
+            <div class="swiper-wrapper"></div>
+            {% for imagename in imagenames %}
+                <div class="swiper-slide">
+                    <img src="/static/downloads/images/{{ imagename }}">
+                    <a href="{{ url_for('download_detection_image', filename=imagename) }}" class="btn btn-default">{{ imagename }}</a>
+                </div>
+            {% endfor %}
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <a href="/download-images" class="btn btn-default">{{ imagenames }}</a>
+        {% endif %}
+    </div>
+
+    {% if videonames %}
+        {% for videoname in videonames %}
+            <video controls="controls" preload="preload">
+                <source src="/static/uploads/videos/{{ videoname }}" type="video/mp4"></source>
+            </video>
+        {% endfor %}
+    {% endif %}
+</section> -->
+{% endblock %}

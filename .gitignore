@@ -1,5 +1,7 @@
 __pycache__
 venv/
+.env
+live/DJI_0784.MP4
 yolov4/
 static/uploads
 static/downloads

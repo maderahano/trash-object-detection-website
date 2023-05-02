@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--==================== LIVE WEBCAM DETECTION ====================-->
+<section class="webcam-detection section" id="webcam-detection">
+    <h2 class="section__title">Live Webcam Detection</h2>
+    <span class="section__subtitle">Use Webcam</span>
+
+    <div class="webcam-detection__container container grid">
+        <div class="webcam-detection__content" id="webcam-detection-custom">
+            <div>
+                <i class="uil uil-image webcam-detection__icon"></i>
+                <h3 class="webcam-detection__title">Webcam Detection</h3>
+            </div>
+        </div>
+
+        <!-- <div id="recorder">
+            <button id="record">Record</button>
+            <button id="stop">Stop</button>
+            <a id="download"></a>
+        </div> -->
+        <form method="post" action="{{ url_for('tasks') }}">
+            <input type="submit" value="Stop/Start" name="stop">
+            <input type="submit" value="Trash" name="trash">
+            <input type="submit" value="Capture" name="click">
+            <input type="submit" value="Grey" name="grey">
+            <input type="submit" value="Negative" name="neg">
+            <input type="submit" value="Start/Stop Recording" name="rec">
+        </form>
+        <img id="video" src="{{ url_for('live_webcam') }}">
+    </div>
+</section>
+
+<!--==================== LIVE DRONE DETECTION ====================-->
+<section class="drone-detection section" id="drone-detection">
+    <h2 class="section__title">Live Drone Detection</h2>
+    <span class="section__subtitle">Use Drone</span>
+
+    <div class="drone-detection__container container grid">
+        <div class="drone-detection__content" id="drone-detection-custom">
+            <div>
+                <i class="uil uil-image drone-detection__icon"></i>
+                <h3 class="drone-detection__title">Drone Detection</h3>
+            </div>
+
+            <div class="drone-detection__modal">
+                <div class="drone-detection__modal-content">
+                    <h4 class="drone-detection__modal-title">Link RTPM</h4>
+                    <i class="uil uil-times drone-detection__modal-close"></i>
+
+                    <form class="contact__form grid">
+                        <div class="contact__inputs grid">
+                            <div class="drone-detection__modal-box">
+                                <label for="linkrtmpInput" class="drone-detection__modal-label">RTMP Server</label>
+                                <input type="text" class="drone-detection__modal-input" id="linkrtmpInput">
+                            </div>
+
+                            <div>
+                                <button type="submit" class="button button--flex">
+                                    Send
+                                    <i class="uil uil-message button__icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- <div id="successAlert" class="alert alert-success" role="alert" style="display:none;"></div>
+                    <div id="errorAlert" class="alert alert-danger" role="alert" style="display:none;"></div> -->
+                </div>
+            </div>
+        </div>
+
+        <img id="video" src="{{ url_for('live_drone') }}">
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--==================== LIVE WEBCAM DETECTION ====================-->
+<section class="live section" id="live">
+    <h2 class="section__title">Live Detection</h2>
+    <span class="section__subtitle">Use Webcam or Drone</span>
+
+    <div class="live__container container grid">
+        <form method="post" action="{{ url_for('tasks') }}">
+            <div class="drone__content">
+                <div class="link__input-box">
+                    <label for="linkrtmpInput" class="drone-detection__modal-label">RTMP Server</label>
+                    <input type="text" class="drone-detection__modal-input" id="linkrtmpInput", name="linkrtmp">
+                </div>
+                <button type="submit" class="button button--flex send__linkrtmp">
+                    Send
+                    <i class="uil uil-message button__icon"></i>
+                </button>
+            </div>
+        </form>
+    
+        <p class="or__text">Or</p>
+        <div class="webcam__content">
+            <form method="post" action="{{ url_for('tasks') }}">
+                <button type="submit" value="0" class="button button--flex" name="linkrtmp">
+                    Webcam
+                    <i class="uil uil-message button__icon"></i>
+                </button>
+            </form>
+        </div>
+    
+        <img id="video" src="{{ url_for('live_drone') }}">
+    </div>
+</section>
+{% endblock %}
