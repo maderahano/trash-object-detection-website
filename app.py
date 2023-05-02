@@ -61,14 +61,8 @@ def upload():
 
 @app.route("/map")
 def map():
-    mymap = Map(
-        identifier="view-side",
-        lat=37.4419,
-        lng=-122.1419,
-        markers=[(37.4419, -122.1419)]
-    )
-    sndmap = Map(
-        identifier="sndmap",
+    map = Map(
+        identifier="view-map",
         lat=37.4419,
         lng=-122.1419,
         markers=[
@@ -86,7 +80,7 @@ def map():
           }
         ]
     )
-    return render_template('map.html', mymap=mymap, sndmap=sndmap)
+    return render_template('map.html', map=map)
 
 @app.route("/try-upload")
 def try_upload():

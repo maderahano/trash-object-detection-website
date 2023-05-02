@@ -405,6 +405,32 @@ video{
     color: var(--first-color-alt)
 }
 
+/*==================== MAP ====================*/
+.map__container{
+    gap: 1.5rem;
+}
+
+.map__content{
+    max-width: 100%;
+    height: auto;
+    background-color: var(--container-color);
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    border-radius: .25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    transition: .3s;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.map__content:hover{
+    box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+
+.map__value{
+    max-width: 100%;
+    height: auto;
+}
+
 /*==================== IMAGE DETECTION ====================*/
 .detection__container{
     gap: 1.5rem;
@@ -915,6 +941,10 @@ video{
         gap: .5rem;
     }
 
+    .services__container{
+        grid-template-columns: max-content;
+        justify-content: center;
+    }
     .services__content{
         padding-right: 3.5rem;
     }
@@ -1082,6 +1112,10 @@ video{
         grid-template-columns: .5fr;
     }
 
+    .services__container{
+        grid-template-columns: repeat(3, 218px);
+        justify-content: center;
+    }
     .services__icon{
         font-size: 2rem;
     }
@@ -1152,6 +1186,10 @@ video{
     }
     .home__social{
         transform: translateX(-6rem);
+    }
+
+    .services__container{
+        grid-template-columns: repeat(3, 238px);
     }
 
     .detection__container{

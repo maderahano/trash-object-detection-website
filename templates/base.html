@@ -18,6 +18,10 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
 
     <title>Trash Object Detection Website</title>
+
+    {% if map %}
+        {{ "decoupled-map"|googlemap_js(37.4419, -122.1419, markers=[(37.4419,-122.1419)]) }} {{map.js}}
+    {% endif %}
 </head>
 <body>
     <!--==================== HEADER ====================-->
