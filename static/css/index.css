@@ -407,6 +407,8 @@ video{
 
 /*==================== MAP ====================*/
 .map__container{
+    max-width: 100%;
+    height: auto;
     gap: 1.5rem;
 }
 
@@ -499,7 +501,8 @@ video{
 }
 
 .portfolio__img{
-    width: 265px;
+    max-width: 100%;
+    height: auto;
     border-radius: .5rem;
     justify-content: center;
 }
@@ -600,6 +603,40 @@ video{
 .active-modal-video-detection{
     opacity: 1;
     visibility: visible;
+}
+
+/*==================== MEDIA RESULT DETECTION ====================*/
+.media__container{
+    gap: 1.5rem;
+}
+
+.media__content{
+    max-width: 100%;
+    height: auto;
+    background-color: var(--container-color);
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    border-radius: .25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+    transition: .3s;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.media__content:hover{
+    box-shadow: 0 4px 8px rgba(0,0,0,.15);
+}
+
+.button__download{
+    display: inline-block;
+    background-color: var(--first-color);
+    color: #FFF;
+    padding: .5rem;
+    border-radius: .5rem;
+    font-weight: var(--font-medium);
+}
+
+.button__download:hover{
+    background-color: var(--first-color-alt);
 }
 
 /*==================== LIVE DETECTION ====================*/
@@ -1128,6 +1165,10 @@ video{
 
     .detection__container{
         grid-template-columns: repeat(2, 218px);
+        justify-content: center;
+    }
+
+    .download__all_images__buttons{
         justify-content: center;
     }
 

@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, send_file, send_fro
 from werkzeug.utils import secure_filename
 from flask_googlemaps import GoogleMaps, Map, icons
 from dotenv import load_dotenv
+from GPSPhoto import gpsphoto
 import random
 import os, sys
 import logging
@@ -98,12 +99,16 @@ def upload_detection_images():
     if 'uploadImageFiles' not in request.files:
         return redirect(request.url)
     
+    image_names = []
+    locations = []
+    
     files = request.files.getlist('uploadImageFiles')   
     for file in files:
         if file and allowed_image_file(file.filename):
             filename = secure_filename(file.filename)
             image_names.append(filename)
             file.save(os.path.join(upload_images, filename))
+            locations.append(gpsphoto.getGPSData(os.path.join(upload_images, filename)))
 
             subprocess.run(['./darknet', 'detector', 'test', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/images/", filename), '-thresh 0.3', '-dont_show'], cwd='yolov4')
             subprocess.run(['cp', 'predictions.jpg', '../static/downloads/images/'], cwd='yolov4')
@@ -113,8 +118,18 @@ def upload_detection_images():
             msg = 'Files successfully uploaded!'
         else:
             msg = 'Invalid Upload!'
+
+    map = Map(
+        identifier="view-map",
+        maptype='SATELLITE',
+        style="height:600px;width:900px",
+        lat=locations[0]['Latitude'],
+        lng=locations[0]['Longitude'],
+        markers=[(loc['Latitude'], loc['Longitude']) for loc in locations],
+        fit_markers_to_bounds = True 
+    )
     
-    return render_template('tryUpload.html', msg=msg, imagenames=image_names)
+    return render_template('tryUpload.html', msg=msg, imagenames=image_names, map=map)
 
 @app.route("/download-images", methods=['GET'])
 def download_detection_images():

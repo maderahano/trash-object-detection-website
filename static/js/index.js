@@ -341,13 +341,6 @@ $(document).ready(function (e) {
     });
 });
 
-let swiper = new Swiper(".show-image-detection__container", {
-    navigation: {
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    },
-  });
-
 let swiperResultImage = new Swiper('.show-image-detection__container', {
     cssMode: true,
     loop: true,
