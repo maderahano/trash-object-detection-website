@@ -2,6 +2,14 @@
 
 {% block content %}
 <section class="drone section" id="drone">
-    <video id="streamDrone" autoplay="true" controls="controls"></video>
+    <!-- <img id="video" src="{{ url_for('stream_drone') }}"> -->
+    <div class="media__container grid">
+        <div class="map__content">
+            <!-- <video controls="controls" autoplay="autoplay">
+                <source src="{{ url_for('live_drone') }}" type="video/mp4"></source>
+            </video> -->
+            <img id="video" src="{{ url_for('live_drone') }}">
+        </div>
+    </div>
 </section>
 {% endblock %}

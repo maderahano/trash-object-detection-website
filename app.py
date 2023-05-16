@@ -1,10 +1,11 @@
 from re import DEBUG, sub
 from io import BytesIO
-from flask import Flask, render_template, request, redirect, send_file, send_from_directory, url_for, flash, jsonify, Response
+from flask import Flask, render_template, request, redirect, send_file, send_from_directory, url_for, flash, jsonify, Response, stream_with_context
 from werkzeug.utils import secure_filename
 from flask_googlemaps import GoogleMaps, Map, icons
 from dotenv import load_dotenv
 from GPSPhoto import gpsphoto
+import ffmpeg_streaming
 import random
 import os, sys
 import logging
@@ -89,7 +90,46 @@ def try_upload():
 
 @app.route("/drone")
 def drone():
+    # subprocess.run(['sh', 'stream1.sh'], cwd='live')
+    # video = ffmpeg_streaming.input('rtmp://127.0.0.1/live/str')
+
     return render_template('drone.html')
+
+@app.route("/stream-drone")
+def stream_drone():
+    def generate():
+        startTime = time.time()
+        buffer = []
+        sentBurst = False
+
+        ffmpeg_command = ["sh", "stream1.sh"]
+        process = subprocess.Popen(ffmpeg_command, cwd='live', stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
+
+        while True:
+            # Get some data from ffmpeg
+            line = process.stdout.read(1024)
+
+            # We buffer everything before outputting it
+            buffer.append(line)
+
+            # Minimum buffer time, 3 seconds
+            if sentBurst is False and time.time() > startTime + 3 and len(buffer) > 0:
+                sentBurst = True
+
+                for i in range(0, len(buffer) - 2):
+                    print("Send initial burst #", i)
+                    yield buffer.pop(0)
+
+            elif time.time() > startTime + 3 and len(buffer) > 0:
+                yield buffer.pop(0)
+
+            process.poll()
+            if isinstance(process.returncode, int):
+                if process.returncode > 0:
+                    print('FFmpeg Error')
+                break
+
+    return Response(stream_with_context(generate()), mimetype = "audio/mpeg")    
 
 @app.route("/upload-images", methods=['POST'])
 def upload_detection_images():
@@ -485,13 +525,14 @@ def detect_video():
 
 drone = cv2.VideoCapture(0)
 
-def gen_drone_frames():
-    global out, capture, rec_frame
+def drone_gen_frames():
+    drone = cv2.VideoCapture('rtmp://192.168.119.87/live/str')
+    # global out, capture, rec_frame
     while True:
         success, frame = drone.read()
         if success:
             try:                
-                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+                ret, buffer = cv2.imencode('.jpg', frame) # Change "frame" to cv2.flip(frame,1) if you want to flip horizontal
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             except Exception as e:
@@ -501,21 +542,21 @@ def gen_drone_frames():
 
 @app.route('/live-drone')
 def live_drone():
-    return Response(gen_drone_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(drone_gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/requests', methods=['POST', 'GET'])
-def tasks():
-    global switch, drone
-    link_rtmp = request.form.get('linkrtmp')
+# @app.route('/requests', methods=['POST', 'GET'])
+# def tasks():
+#     global switch, drone
+#     link_rtmp = request.form.get('linkrtmp')
 
-    if not link_rtmp:
-        return jsonify({'error' : 'Nothing Found!'})
+#     if not link_rtmp:
+#         return jsonify({'error' : 'Nothing Found!'})
 
-    print("The value of link RTMP is ", link_rtmp)
-    print("The type data value of link RTMP is ", type(link_rtmp))
-    drone = cv2.VideoCapture(int(link_rtmp))
+#     print("The value of link RTMP is ", link_rtmp)
+#     print("The type data value of link RTMP is ", type(link_rtmp))
+#     drone = cv2.VideoCapture(int(link_rtmp))
 
-    return render_template('live.html')
+#     return render_template('live.html')
             
 drone.release()
 cv2.destroyAllWindows()

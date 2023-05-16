@@ -10,3 +10,6 @@
 
 - Serve Flask Application with Gunicorn and Nginx : https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-22-04
 
+- Ngrok + RTMP : https://www.daily.co/blog/run-your-own-live-streaming-server/
+
+- Apache Kafka : https://medium.com/@kevin.michael.horan/distributed-video-streaming-with-python-and-kafka-551de69fe1dd
