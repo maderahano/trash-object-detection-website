@@ -82,7 +82,7 @@
             {% if videonames %}
                 {% for videoname in videonames %}
                     <video controls="controls" preload="preload">
-                        <source src="/static/uploads/videos/{{ videoname }}" type="video/mp4"></source>
+                        <source src="/static/downloads/videos/{{ videoname }}" type="video/mp4"></source>
                     </video>
                     <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default">
                         Download <i class="uil uil-download-alt button__icon"></i>

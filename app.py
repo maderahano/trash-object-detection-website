@@ -159,15 +159,19 @@ def upload_detection_images():
         else:
             msg = 'Invalid Upload!'
 
-    map = Map(
-        identifier="view-map",
-        maptype='SATELLITE',
-        style="height:600px;width:900px",
-        lat=locations[0]['Latitude'],
-        lng=locations[0]['Longitude'],
-        markers=[(loc['Latitude'], loc['Longitude']) for loc in locations],
-        fit_markers_to_bounds = True 
-    )
+    print(locations)
+    if len(locations[0]) > 0:
+        map = Map(
+            identifier="view-map",
+            maptype='SATELLITE',
+            style="height:600px;width:900px",
+            lat=locations[0]['Latitude'],
+            lng=locations[0]['Longitude'],
+            markers=[(loc['Latitude'], loc['Longitude']) for loc in locations],
+            fit_markers_to_bounds = True 
+        )
+    else:
+        map = 0
     
     return render_template('tryUpload.html', msg=msg, imagenames=image_names, map=map)
 

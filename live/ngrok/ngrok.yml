@@ -1,0 +1,6 @@
+version: "2"
+authtoken: YOUR_AUTH_TOKEN
+tunnels:
+  rtmp:
+    proto: tcp
+    addr: 1935
