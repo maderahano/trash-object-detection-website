@@ -9,4 +9,6 @@ live/Video EWaras.mp4
 yolov4/
 static/uploads
 static/downloads
+static/webcam
+activate.sh
 upgrade_module.sh

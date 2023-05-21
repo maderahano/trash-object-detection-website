@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--==================== LIVE WEBCAM DETECTION ====================-->
+<section class="webcam-detection section" id="webcam-detection">
+    <h2 class="section__title">Live Webcam Detection</h2>
+    <span class="section__subtitle">Use Webcam</span>
+
+    <div class="webcam-detection__container container grid">
+        <div class="portfolio__content swiper-slide">
+            <form method="post" action="{{ url_for('tasks_webcam') }}">
+                <input type="submit" value="Stop/Start" name="stop">
+                <input type="submit" value="Capture" name="click">
+                <input type="submit" value="Grey" name="grey">
+                <input type="submit" value="Negative" name="neg">
+                <input type="submit" value="Start/Stop Recording" name="rec">
+            </form>
+            <img id="video" src="{{ url_for('live_webcam') }}">
+        </div>
+    </div>
+</section>
+{% endblock %}
