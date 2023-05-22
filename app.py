@@ -211,27 +211,27 @@ def gen_webcam_frames():
     while True:
         success, frame = camera.read()
         if success:
+            results = model(frame)
+            detection = np.squeeze(results.render())
+
             if(grey_webcam):
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                detection = cv2.cvtColor(detection, cv2.COLOR_BGR2GRAY)
             if(neg_webcam):
-                frame = cv2.bitwise_not(frame)
+                detection = cv2.bitwise_not(detection)
             if(capture_webcam):
                 capture_webcam = 0
                 now = datetime.datetime.now()
                 p = os.path.sep.join(['static/webcam/images/', "shot_{}.png".format(str(now).replace(":",''))])
-                cv2.imwrite(p, frame)
+                cv2.imwrite(p, detection)
             if(rec_webcam):
-                rec_frame_webcam = frame
-                frame = cv2.putText(cv2.flip(frame,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
-                frame = cv2.flip(frame,1)
-
-            results = model(frame)
-            a = np.squeeze(results.render())
+                rec_frame_webcam = detection
+                detection = cv2.putText(cv2.flip(detection,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
+                detection = cv2.flip(detection,1)
 
             try:                
-                ret, buffer = cv2.imencode('.jpg', a)
-                a = buffer.tobytes()
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + a + b'\r\n')
+                ret, buffer = cv2.imencode('.jpg', detection)
+                detection = buffer.tobytes()
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + detection + b'\r\n')
             except Exception as e:
                 pass
         else:
@@ -305,27 +305,27 @@ def gen_drone_frames():
     while True:
         success, frame = camera_drone.read()
         if success:
+            results = model(frame)
+            detection = np.squeeze(results.render())
+
             if(grey_drone):
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                detection = cv2.cvtColor(detection, cv2.COLOR_BGR2GRAY)
             if(neg_drone):
-                frame = cv2.bitwise_not(frame)
+                detection = cv2.bitwise_not(detection)
             if(capture_drone):
                 capture_drone = 0
                 now = datetime.datetime.now()
                 p = os.path.sep.join(['static/drone/images/', "shot_{}.png".format(str(now).replace(":",''))])
-                cv2.imwrite(p, frame)
+                cv2.imwrite(p, detection)
             if(rec_drone):
-                rec_frame_drone = frame
-                frame = cv2.putText(cv2.flip(frame,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
-                frame = cv2.flip(frame,1)
-
-            results = model(frame)
-            a = np.squeeze(results.render())
+                rec_frame_drone = detection
+                detection = cv2.putText(cv2.flip(detection,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
+                detection = cv2.flip(detection,1)
 
             try:                
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                ret, buffer = cv2.imencode('.jpg', detection)
+                detection = buffer.tobytes()
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + detection + b'\r\n')
             except Exception as e:
                 pass
         else:
