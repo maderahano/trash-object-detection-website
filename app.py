@@ -8,6 +8,7 @@ from GPSPhoto import gpsphoto
 import random
 import os, sys
 import logging
+import torch
 # import darknet
 import colorsys
 import subprocess
@@ -40,6 +41,7 @@ upload_videos = os.path.join(UPLOAD_FOLDER, 'videos')
 download_images = os.path.join(DOWNLOAD_FOLDER, 'images')
 download_videos = os.path.join(DOWNLOAD_FOLDER, 'videos')
 
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 GoogleMaps(app)
 
 def allowed_image_file(filename):
@@ -185,12 +187,12 @@ def download_detection_video(filename):
     
 # WEBCAM DETECTION
 
-global camera, capture, rec_frame, grey, switch, neg, rec, out
-capture = 0
-grey = 0
-neg = 0
-switch = 0
-rec = 0
+global camera, capture_webcam, rec_frame_webcam, grey_webcam, switch_webcam, neg_webcam, rec_webcam, out_webcam
+capture_webcam = 0
+grey_webcam = 0
+neg_webcam = 0
+switch_webcam = 0
+rec_webcam = 0
 
 # Make Shots Directory to Save Pics
 try:
@@ -198,35 +200,38 @@ try:
 except OSError as error:
     pass
 
-def record(out):
-    global rec_frame
-    while(rec):
+def record_webcam(out_webcam):
+    global rec_frame_webcam
+    while(rec_webcam):
         time.sleep(0.05)
-        out.write(rec_frame)
+        out_webcam.write(rec_frame_webcam)
 
 def gen_webcam_frames():
-    global out, capture, rec_frame
+    global out_webcam, capture_webcam, rec_frame_webcam
     while True:
         success, frame = camera.read()
         if success:
-            if(grey):
+            if(grey_webcam):
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            if(neg):
+            if(neg_webcam):
                 frame = cv2.bitwise_not(frame)
-            if(capture):
-                capture = 0
+            if(capture_webcam):
+                capture_webcam = 0
                 now = datetime.datetime.now()
                 p = os.path.sep.join(['static/webcam/images/', "shot_{}.png".format(str(now).replace(":",''))])
                 cv2.imwrite(p, frame)
-            if(rec):
-                rec_frame = frame
+            if(rec_webcam):
+                rec_frame_webcam = frame
                 frame = cv2.putText(cv2.flip(frame,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
                 frame = cv2.flip(frame,1)
 
+            results = model(frame)
+            a = np.squeeze(results.render())
+
             try:                
-                ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                ret, buffer = cv2.imencode('.jpg', a)
+                a = buffer.tobytes()
+                yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + a + b'\r\n')
             except Exception as e:
                 pass
         else:
@@ -238,79 +243,132 @@ def live_webcam():
 
 @app.route('/requests-webcam', methods=['POST', 'GET'])
 def tasks_webcam():
-    global switch, camera
+    global switch_webcam, camera
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
-            global capture
-            capture = 1
+            global capture_webcam
+            capture_webcam = 1
         elif request.form.get('grey') == 'Grey':
-            global grey
-            grey = not grey
+            global grey_webcam
+            grey_webcam = not grey_webcam
         elif request.form.get('neg') == 'Negative':
-            global neg
-            neg = not neg
+            global neg_webcam
+            neg_webcam = not neg_webcam
         elif request.form.get('stop') == 'Stop/Start':
             global camera
-            if (switch == 1):
-                switch = 0
+            if (switch_webcam == 1):
+                switch_webcam = 0
                 camera.release()
             else:
                 camera = cv2.VideoCapture(0)
-                switch = 1
+                switch_webcam = 1
         elif request.form.get('rec') == 'Start/Stop Recording':
-            global rec, out
-            rec = not rec
-            if (rec):
+            global rec_webcam, out_webcam
+            rec_webcam = not rec_webcam
+            if (rec_webcam):
                 now = datetime.datetime.now()
                 fourcc = cv2.VideoWriter_fourcc(*'XVID')
                 p = os.path.sep.join(['static/webcam/videos/', "vid_{}.avi".format(str(now).replace(":",''))])
-                out = cv2.VideoWriter(p, fourcc, 20.0, (640, 480))
+                out_webcam = cv2.VideoWriter(p, fourcc, 20.0, (640, 480))
                 # Start New Thread for Recording the Video
-                thread = Thread(target = record, args=[out,])
+                thread = Thread(target = record_webcam, args=[out_webcam,])
                 thread.start()
-            elif (rec == False):
-                out.release()
+            elif (rec_webcam == False):
+                out_webcam.release()
     elif request.method == 'GET':
         return render_template('webcam.html')
     return render_template('webcam.html')
 
-
 # DRONE DETECTION
 
-drone = cv2.VideoCapture(0)
+global camera_drone, capture_drone, rec_frame_drone, grey_drone, switch_drone, neg_drone, rec_drone, out_drone
+capture_drone = 0
+grey_drone = 0
+neg_drone = 0
+switch_drone = 0
+rec_drone = 0
 
-def drone_gen_frames():
-    drone = cv2.VideoCapture('rtmp://192.168.119.87/live/str')
-    # global out, capture, rec_frame
+# Make Shots Directory to Save Pics
+try:
+    os.mkdir('./shots')
+except OSError as error:
+    pass
+
+def record_drone(out_drone):
+    global rec_frame_drone
+    while(rec_drone):
+        time.sleep(0.05)
+        out_drone.write(rec_frame_drone)
+
+def gen_drone_frames():
+    global out_drone, capture_drone, rec_frame_drone
     while True:
-        success, frame = drone.read()
+        success, frame = camera_drone.read()
         if success:
+            if(grey_drone):
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            if(neg_drone):
+                frame = cv2.bitwise_not(frame)
+            if(capture_drone):
+                capture_drone = 0
+                now = datetime.datetime.now()
+                p = os.path.sep.join(['static/drone/images/', "shot_{}.png".format(str(now).replace(":",''))])
+                cv2.imwrite(p, frame)
+            if(rec_drone):
+                rec_frame_drone = frame
+                frame = cv2.putText(cv2.flip(frame,1),"Recording...", (0,25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 4)
+                frame = cv2.flip(frame,1)
+
+            results = model(frame)
+            a = np.squeeze(results.render())
+
             try:                
-                ret, buffer = cv2.imencode('.jpg', frame) # Change "frame" to cv2.flip(frame,1) if you want to flip horizontal
+                ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             except Exception as e:
                 pass
         else:
             pass
-
+    
 @app.route('/live-drone')
 def live_drone():
-    return Response(drone_gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen_drone_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# @app.route('/requests', methods=['POST', 'GET'])
-# def tasks():
-#     global switch, drone
-#     link_rtmp = request.form.get('linkrtmp')
-
-#     if not link_rtmp:
-#         return jsonify({'error' : 'Nothing Found!'})
-
-#     print("The value of link RTMP is ", link_rtmp)
-#     print("The type data value of link RTMP is ", type(link_rtmp))
-#     drone = cv2.VideoCapture(int(link_rtmp))
-
-#     return render_template('live.html')
-            
-drone.release()
-cv2.destroyAllWindows()
+@app.route('/requests-drone', methods=['POST', 'GET'])
+def tasks_drone():
+    global switch_drone, camera_drone
+    if request.method == 'POST':
+        if request.form.get('click') == 'Capture':
+            global capture_drone
+            capture_drone = 1
+        elif request.form.get('grey') == 'Grey':
+            global grey_drone
+            grey_drone = not grey_drone
+        elif request.form.get('neg') == 'Negative':
+            global neg_drone
+            neg_drone = not neg_drone
+        elif request.form.get('stop') == 'Stop/Start':
+            global camera_drone
+            if (switch_drone == 1):
+                switch_drone = 0
+                camera_drone.release()
+            else:
+                camera_drone = cv2.VideoCapture('rtmp://0.tcp.ap.ngrok.io:13825/live/stream')
+                switch_drone = 1
+        elif request.form.get('rec') == 'Start/Stop Recording':
+            global rec_drone, out_drone
+            rec_drone = not rec_drone
+            if (rec_drone):
+                now = datetime.datetime.now()
+                fourcc = cv2.VideoWriter_fourcc(*'XVID')
+                p = os.path.sep.join(['static/drone/videos/', "vid_{}.avi".format(str(now).replace(":",''))])
+                out_drone = cv2.VideoWriter(p, fourcc, 20.0, (640, 480))
+                # Start New Thread for Recording the Video
+                thread = Thread(target = record_drone, args=[out_drone,])
+                thread.start()
+            elif (rec_drone == False):
+                out_drone.release()
+    elif request.method == 'GET':
+        return render_template('drone.html')
+    return render_template('drone.html')

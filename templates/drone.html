@@ -1,13 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="drone section" id="drone">
-    <!-- <img id="video" src="{{ url_for('stream_drone') }}"> -->
-    <div class="media__container grid">
-        <div class="map__content">
-            <!-- <video controls="controls" autoplay="autoplay">
-                <source src="{{ url_for('live_drone') }}" type="video/mp4"></source>
-            </video> -->
+<!--==================== LIVE WEBCAM DETECTION ====================-->
+<section class="webcam-detection section" id="webcam-detection">
+    <h2 class="section__title">Live Drone Detection</h2>
+    <span class="section__subtitle">Use Drone</span>
+
+    <div class="webcam-detection__container container grid">
+        <div class="portfolio__content swiper-slide">
+            <form method="post" action="{{ url_for('tasks_drone') }}">
+                <input type="submit" value="Stop/Start" name="stop">
+                <input type="submit" value="Capture" name="click">
+                <input type="submit" value="Grey" name="grey">
+                <input type="submit" value="Negative" name="neg">
+                <input type="submit" value="Start/Stop Recording" name="rec">
+            </form>
             <img id="video" src="{{ url_for('live_drone') }}">
         </div>
     </div>
