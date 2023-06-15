@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from flask_googlemaps import GoogleMaps, Map, icons
 from dotenv import load_dotenv
 from GPSPhoto import gpsphoto
+import shutil
 import random
 import os, sys
 import logging
@@ -41,7 +42,8 @@ upload_videos = os.path.join(UPLOAD_FOLDER, 'videos')
 download_images = os.path.join(DOWNLOAD_FOLDER, 'images')
 download_videos = os.path.join(DOWNLOAD_FOLDER, 'videos')
 
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+model = torch.hub.load('yolo', 'custom', path='yolo/runs/train/exp6/weights/best.pt', source='local')  # local repo
+# model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 GoogleMaps(app)
 
 def allowed_image_file(filename):
@@ -52,7 +54,7 @@ def allowed_video_file(filename):
 
 @app.route("/")
 def main():
-    return render_template('index.html')
+    return render_template('upload.html')
 
 @app.route("/live")
 def live():
@@ -114,10 +116,30 @@ def upload_detection_images():
             file.save(os.path.join(upload_images, filename))
             locations.append(gpsphoto.getGPSData(os.path.join(upload_images, filename)))
 
-            subprocess.run(['./darknet', 'detector', 'test', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/images/", filename), '-thresh 0.3', '-dont_show'], cwd='yolov4')
-            subprocess.run(['cp', 'predictions.jpg', '../static/downloads/images/'], cwd='yolov4')
-            subprocess.run(['cp', 'predictions.jpg', filename], cwd='static/downloads/images')
-            subprocess.run(['rm', 'predictions.jpg'], cwd='static/downloads/images')
+            # YOLOv5 Using Pytorch Command
+            img = ''
+            img = upload_images + '/' + filename
+
+            results = model(img)
+            results.save()
+            timestamp = os.listdir('runs/detect/')[0]
+            shutil.move(os.path.join('runs/detect', timestamp), download_images)
+            subprocess.run(['mv', os.path.join('exp', filename), '.'], cwd='static/downloads/images')
+            subprocess.run(['rmdir', 'exp'], cwd='static/downloads/images')
+            subprocess.run(['rm', '-rf', 'runs'])
+
+            print(results.pandas().xyxy[0])
+            print(results.pandas().xyxy[0].value_counts('name'))
+            # results.pandas().xyxy[0]
+            # results.pandas().xyxy[0].value_counts['name']
+
+            # YOLOv5 Using Python Command
+            # subprocess.run(['python', 'detect.py', '--weights', 'yolo/runs/train/exp6/weights/best.pt', '--source', os.path.join("../static/uploads/images/", filename),'--project', '../static/downloads', '--name', 'images'], cwd='yolo')
+            # YOLOv4 Darknet Configuration
+            # subprocess.run(['./darknet', 'detector', 'test', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/images/", filename), '-thresh 0.3', '-dont_show'], cwd='yolov4')
+            # subprocess.run(['cp', 'predictions.jpg', '../static/downloads/images/'], cwd='yolov4')
+            # subprocess.run(['cp', 'predictions.jpg', filename], cwd='static/downloads/images')
+            # subprocess.run(['rm', 'predictions.jpg'], cwd='static/downloads/images')
             
             msg = 'Files successfully uploaded!'
         else:
@@ -156,8 +178,11 @@ def download_detection_image(filename):
 
 # VIDEO DETECTION
 
+# global video, resultDetection
+
 @app.route("/upload-videos", methods=['POST'])
 def upload_detection_videos():
+    # global video, resultDetection
     if not request.method == "POST":
         return redirect(request.url)
 
@@ -173,13 +198,81 @@ def upload_detection_videos():
             video_names.append(filename)
             file.save(os.path.join(upload_videos, filename))
 
-            subprocess.run(['./darknet', 'detector', 'demo', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/videos/", filename), '-i', '0', '-out_filename', os.path.join("../static/downloads/videos/", filename), '-dont_show'], cwd='yolov4')
+            # YOLOv5 Using Pytorch Command
+            locVid = ''
+            locVid = upload_videos + '/' +filename
+            video = cv2.VideoCapture(locVid)
+
+            if (video.isOpened()== False): 
+                print("Error opening video stream or file")
+
+            saveVideo = os.path.sep.join(['static/downloads/videos/', filename])
+            fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+            frame_width = int(video.get(3))
+            frame_height = int(video.get(4))
+            # Find OpenCV version
+            (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
+        
+            if int(major_ver)  < 3 :
+                fps = video.get(cv2.cv.CV_CAP_PROP_FPS)
+                # print ("Frames per second using video.get(cv2.cv.CV_CAP_PROP_FPS): {0}".format(fps))
+            else :
+                fps = video.get(cv2.CAP_PROP_FPS)
+                # print ("Frames per second using video.get(cv2.CAP_PROP_FPS) : {0}".format(fps))
+
+            resultDetection = cv2.VideoWriter(saveVideo, fourcc, fps, (frame_width, frame_height))
+            
+            while(video.isOpened()):
+                success, frame = video.read()
+                if success:
+                    results = model(frame)
+                    detection = np.squeeze(results.render())
+
+                    print(results.pandas().xyxy[0])
+                    print(results.pandas().xyxy[0].value_counts('name'))
+
+                    time.sleep(0.05)
+                    resultDetection.write(detection)
+                else:
+                    break
+            
+            video.release()
+            resultDetection.release()
+
+            # YOLOv5 Using Python Command
+            # subprocess.run(['python', 'detect.py', '--weights', 'yolo/runs/train/exp6/weights/best.pt', '--source', os.path.join("../static/uploads/videos/", filename),'--project', '../static/downloads', '--name', 'videos'], cwd='yolo')
+            # YOLOv4 Darknet Configuration
+            # subprocess.run(['./darknet', 'detector', 'demo', 'data/obj.data', 'cfg/trash.cfg', 'backup/trash/training/trash_best.weights', os.path.join("../static/uploads/videos/", filename), '-i', '0', '-out_filename', os.path.join("../static/downloads/videos/", filename), '-dont_show'], cwd='yolov4')
             
             msg = 'Files successfully uploaded!'
+            print(msg)
         else:
             msg = 'Invalid Upload!'
     
     return render_template('upload.html', msg=msg, videonames=video_names)
+
+# def gen_video_frames():
+#     global video, resultDetection
+#     while (video.isOpened()):
+#         success, frame = video.read()
+#         if success:
+#             results = model(frame)
+#             detection = np.squeeze(results.render())
+
+#             time.sleep(0.05)
+#             resultDetection.write(detection)
+#             try:                
+#                 ret, buffer = cv2.imencode('.jpg', detection)
+#                 detection = buffer.tobytes()
+#                 yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + detection + b'\r\n')
+#             except Exception as e:
+#                 pass
+#         else:
+#             pass
+
+# @app.route('/display-video')
+# def display_video():
+#     return Response(gen_video_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route("/download-video/<path:filename>", methods=['GET'])
 def download_detection_video(filename):
@@ -354,7 +447,7 @@ def tasks_drone():
                 switch_drone = 0
                 camera_drone.release()
             else:
-                camera_drone = cv2.VideoCapture('rtmp://0.tcp.ap.ngrok.io:13825/live/stream')
+                camera_drone = cv2.VideoCapture('rtmp://0.tcp.ap.ngrok.io:19336/live/stream')
                 switch_drone = 1
         elif request.form.get('rec') == 'Start/Stop Recording':
             global rec_drone, out_drone
