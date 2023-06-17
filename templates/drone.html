@@ -6,14 +6,21 @@
     <h2 class="section__title">Live Drone Detection</h2>
     <span class="section__subtitle">Use Drone</span>
 
-    <div class="webcam-detection__container container grid">
-        <div class="portfolio__content swiper-slide">
+    {% if linkRTMP %}
+    <div class="contact__content">
+        <label for="" class="contact__label">Link RTMP</label>
+        <p class="contact__input">{{ linkRTMP }}</p>
+    </div>
+    {% endif %}
+
+    <div class="media__container grid">
+        <div class="map__content">
             <form method="post" action="{{ url_for('tasks_drone') }}">
-                <input type="submit" value="Stop/Start" name="stop">
-                <input type="submit" value="Capture" name="click">
-                <input type="submit" value="Grey" name="grey">
-                <input type="submit" value="Negative" name="neg">
-                <input type="submit" value="Start/Stop Recording" name="rec">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Stop/Start" name="stop">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Capture" name="click">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Grey" name="grey">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Negative" name="neg">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Start/Stop Recording" name="rec">
             </form>
             <img id="video" src="{{ url_for('live_drone') }}">
         </div>

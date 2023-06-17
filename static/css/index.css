@@ -136,9 +136,15 @@ img{
     height: auto;
 }
 
-video{
-    max-width: 100%;
-    height: auto;
+#video{
+    max-width: 1280px;
+    height: 720px;
+}
+
+#live__section{
+    margin-top: 10px;
+    max-width: 1280px;
+    height: 720px;
 }
 
 /*==================== REUSABLE CSS CLASSES ====================*/
@@ -388,6 +394,12 @@ video{
 .button--flex{
     display: inline-flex;
     align-items: center;
+}
+
+.button--flex--video{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .button--small{
@@ -849,6 +861,34 @@ video{
     margin: 30px 0 0 0;
 }
 
+/*==================== CONTACT ====================*/
+
+.contact__content{
+    width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--input-color);
+    border-radius: .5rem;
+    padding: .75rem 1rem .25rem;
+    margin-bottom: 25px;
+}
+
+.contact__label{
+    font-size: var(--smaller-font-size);
+    color: var(--title-color);
+}
+
+.contact__input{
+    width: 100%;
+    background-color: var(--input-color);
+    color: var(--text-color);
+    font-family: var(--body-font);
+    font-size: var(--h2-font-size);
+    border: none;
+    outline: none;
+    padding: .25rem .5rem .5rem 0;
+}
+
 /*==================== FOOTER ====================*/
 .footer{
     padding-top: 2rem;
@@ -1262,4 +1302,24 @@ video{
     /* .contact__inputs{
         grid-template-columns: repeat(2, 1fr);
     } */
+}
+
+.input-icons i {
+    position: absolute;
+}
+  
+.input-icons {
+    width: 100%;
+    margin-bottom: 10px;
+}
+  
+.icon {
+    padding: 10px;
+    min-width: 40px;
+}
+  
+.input-field {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
 }

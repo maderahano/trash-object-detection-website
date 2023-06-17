@@ -6,16 +6,16 @@
     <h2 class="section__title">Live Webcam Detection</h2>
     <span class="section__subtitle">Use Webcam</span>
 
-    <div class="webcam-detection__container container grid">
-        <div class="portfolio__content swiper-slide">
+    <div class="media__container grid">
+        <div class="map__content">
             <form method="post" action="{{ url_for('tasks_webcam') }}">
-                <input type="submit" value="Stop/Start" name="stop">
-                <input type="submit" value="Capture" name="click">
-                <input type="submit" value="Grey" name="grey">
-                <input type="submit" value="Negative" name="neg">
-                <input type="submit" value="Start/Stop Recording" name="rec">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Stop/Start" name="stop">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Capture" name="click">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Grey" name="grey">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Negative" name="neg">
+                <input type="submit" class="button button--flex button--small portfolio__button" value="Start/Stop Recording" name="rec">
             </form>
-            <img id="video" src="{{ url_for('live_webcam') }}">
+            <img id="live__section" src="{{ url_for('live_webcam') }}">
         </div>
     </div>
 </section>

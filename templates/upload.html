@@ -25,7 +25,7 @@
         <!--==================== VIDEO DETECTION ====================-->
         <div class="video-detection__content">
             <div>
-                <i class="uil uil-image video-detection__icon"></i>
+                <i class="uil uil-video video-detection__icon"></i>
                 <h3 class="video-detection__title">Video Detection</h3>
             </div>
 
@@ -42,13 +42,13 @@
 
 <section class="result section" id="result">
     {% if imagenames or videonames %}
-    <h2 class="section__title">Map Detection</h2>
+    <h2 class="section__title">Media Detection</h2>
     
     <div class="media__container grid">
         <div class="map__content">
             <!--==================== IMAGE DETECTION ====================-->
+            {% if imagenames %}
             <div class="portfolio__container container swiper">
-                {% if imagenames %}
                 <div class="swiper-wrapper">
                     {% for imagename in imagenames %}
                     <div class="portfolio__content swiper-slide">
@@ -68,7 +68,6 @@
                     </div>
                     {% endfor %}
                 </div>
-                {% endif %}
                 <div class="swiper-button-next">
                     <i class="uil uil-angle-right-b swiper-portfolio-icon"></i>
                 </div>
@@ -77,14 +76,13 @@
                 </div>
                 <div class="swiper-pagination"></div>
             </div>
+            {% endif %}
         
             <!--==================== VIDEO DETECTION ====================-->
             {% if videonames %}
                 {% for videoname in videonames %}
-                    <video controls="controls" preload="preload">
-                        <source src="/static/downloads/videos/{{ videoname }}" type="video/mp4"></source>
-                    </video>
-                    <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default">
+                    <img id="video" src="{{ url_for('display_video') }}">
+                    <a href="{{ url_for('download_detection_video', filename=videoname) }}" class="btn btn-default button--flex--video">
                         Download <i class="uil uil-download-alt button__icon"></i>
                     </a>
                 {% endfor %}
