@@ -131,14 +131,42 @@ def upload_detection_images():
 
             results = model(img)
             results.save()
+
+            locationImage = 'runs/detect/exp/' + filename
+            print(locationImage)
+            detectionImage = cv2.imread(locationImage)
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            org = (10, -50)
+            fontScale = 4
+            color = [(255,0,0), (255,128,0), (255,255,0), (0,255,0), (0,0,255), (128,0,255), (255,0,255)]
+            print(type(color))
+            thickness = 8
+            idxColor = 0
+            for idx, name in enumerate(results.pandas().xyxy[0].value_counts('name').index.tolist()):
+                listOrg = list(org)
+                listOrg[1] += 150
+                org = tuple(listOrg)
+                finalResult = cv2.putText(detectionImage, name + ' : ' + str(results.pandas().xyxy[0].value_counts('name')[idx]), org, font, fontScale, color[idxColor], thickness, cv2.LINE_AA)
+                idxColor += 1
+
+            cv2.imwrite(locationImage, finalResult)
+
             timestamp = os.listdir('runs/detect/')[0]
             shutil.move(os.path.join('runs/detect', timestamp), download_images)
             subprocess.run(['mv', os.path.join('exp', filename), '.'], cwd='static/downloads/images')
             subprocess.run(['rmdir', 'exp'], cwd='static/downloads/images')
             subprocess.run(['rm', '-rf', 'runs'])
 
+            print("<==========Log Object Detection==========>")
             print(results.pandas().xyxy[0])
+            print("\n")
+            print("<==========Conclusion Object Detection==========>")
             print(results.pandas().xyxy[0].value_counts('name'))
+            print("\n")
+
+            # for idx, name in enumerate(results.pandas().xyxy[0].value_counts('name').index.tolist()):
+            #     print('Key :', name)
+            #     print('Values :', results.pandas().xyxy[0].value_counts('name')[idx])
             # results.pandas().xyxy[0]
             # results.pandas().xyxy[0].value_counts['name']
 
