@@ -384,11 +384,71 @@ def record_webcam(out_webcam):
 
 def gen_webcam_frames():
     global out_webcam, capture_webcam, rec_frame_webcam
+
+    frame_width = int(camera.get(3))
+    frame_height = int(camera.get(4))
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    fontScale = 0.5
+    thickness = 1
+    offset = 9
+    counter = [0,0,0,0,0,0,0]
     while True:
         success, frame = camera.read()
         if success:
             results = model(frame)
             detection = np.squeeze(results.render())
+
+            cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 0, 255), 2)
+
+            for _, row in results.pandas().xyxy[0].iterrows():
+                x1 = int(row['xmin'])
+                y1 = int(row['ymin'])
+                x2 = int(row['xmax'])
+                y2 = int(row['ymax'])
+                item = (row['class'])
+
+                rectx1, recty1 = ((x1+x2)/2, (y1+y2)/2)
+                rectcenter = int(rectx1), int(recty1)
+                cx = rectcenter[0]
+                cy = rectcenter[1]
+                cv2.circle(detection, (cx, cy), 3, (0, 255, 0), -1)
+
+                if item == 0:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[0] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 1:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[1] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 2:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[2] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 3:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[3] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 4:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[4] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 5:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[5] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 6:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[6] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+
+            cv2.putText(detection,'Plastic : ' + str(counter[0]), (5, 30), font, fontScale, (255,0,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Metal : ' + str(counter[1]), (5, 60), font, fontScale, (255,128,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Glass : ' + str(counter[2]), (5, 90), font, fontScale, (255,255,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Wood : ' + str(counter[3]), (5, 120), font, fontScale, (255,0,128), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Paper : ' + str(counter[4]), (5, 150), font, fontScale, (0,0,255), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Rubber : ' + str(counter[5]), (5, 180), font, fontScale, (128,0,255), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Cloth : ' + str(counter[6]), (5, 210), font, fontScale, (255,0,255), thickness, cv2.LINE_AA)
 
             if(grey_webcam):
                 detection = cv2.cvtColor(detection, cv2.COLOR_BGR2GRAY)
@@ -478,11 +538,71 @@ def record_drone(out_drone):
 
 def gen_drone_frames():
     global out_drone, capture_drone, rec_frame_drone
+
+    frame_width = int(camera_drone.get(3))
+    frame_height = int(camera_drone.get(4))
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    fontScale = 0.5
+    thickness = 1
+    offset = 9
+    counter = [0,0,0,0,0,0,0]
     while True:
         success, frame = camera_drone.read()
         if success:
             results = model(frame)
             detection = np.squeeze(results.render())
+
+            cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 0, 255), 2)
+
+            for _, row in results.pandas().xyxy[0].iterrows():
+                x1 = int(row['xmin'])
+                y1 = int(row['ymin'])
+                x2 = int(row['xmax'])
+                y2 = int(row['ymax'])
+                item = (row['class'])
+
+                rectx1, recty1 = ((x1+x2)/2, (y1+y2)/2)
+                rectcenter = int(rectx1), int(recty1)
+                cx = rectcenter[0]
+                cy = rectcenter[1]
+                cv2.circle(detection, (cx, cy), 3, (0, 255, 0), -1)
+
+                if item == 0:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[0] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 1:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[1] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 2:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[2] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 3:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[3] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 4:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[4] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 5:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[5] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+                elif item == 6:
+                    if cy < (int(frame_height/2) + offset) and cy > (int(frame_height/2) - offset):
+                        counter[6] += 1
+                        cv2.line(detection, (0, int(frame_height/2)), (int(frame_width), int(frame_height/2)), (0, 255, 0), 2)
+
+            cv2.putText(detection,'Plastic : ' + str(counter[0]), (5, 30), font, fontScale, (255,0,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Metal : ' + str(counter[1]), (5, 60), font, fontScale, (255,128,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Glass : ' + str(counter[2]), (5, 90), font, fontScale, (255,255,0), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Wood : ' + str(counter[3]), (5, 120), font, fontScale, (255,0,128), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Paper : ' + str(counter[4]), (5, 150), font, fontScale, (0,0,255), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Rubber : ' + str(counter[5]), (5, 180), font, fontScale, (128,0,255), thickness, cv2.LINE_AA)
+            cv2.putText(detection,'Cloth : ' + str(counter[6]), (5, 210), font, fontScale, (255,0,255), thickness, cv2.LINE_AA)
 
             if(grey_drone):
                 detection = cv2.cvtColor(detection, cv2.COLOR_BGR2GRAY)
